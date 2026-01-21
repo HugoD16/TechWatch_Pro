@@ -1,0 +1,60 @@
+<section id="veille" class="section-veille">
+    <div class="container">
+        <h2 class="section-title">VEILLE TECHNOLOGIQUE</h2>
+        <p class="section-subtitle">Sécurité & Failles : Flux automatisé via TechWatch_Pro</p>
+
+        <div class="veille-grid" id="veille-container">
+            <p>Analyse des flux de sécurité en cours...</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function loadVeille() {
+        const container = document.getElementById('veille-container');
+        try {
+            // Récupération du fichier JSON généré par ton script Python
+            const response = await fetch('data_veille.json');
+            if (!response.ok) throw new Error("Fichier de données introuvable");
+
+            const articles = await response.json();
+            container.innerHTML = ''; // On vide le message de chargement
+
+            // Formateur de date : 21 janvier 2026
+            const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+            const frenchDate = new Intl.DateTimeFormat('fr-FR', dateOptions);
+
+            articles.forEach(art => {
+                // Gestion de la date
+                const dateObj = new Date(art.date);
+                const formattedDate = isNaN(dateObj) ? art.date : frenchDate.format(dateObj);
+
+                // Gestion des badges de priorité
+                const isHigh = art.priority === "Haut";
+                const badgeClass = isHigh ? "badge-high" : "badge-normal";
+                const badgeLabel = isHigh ? "⚠ Critique" : "Info";
+
+                // Construction de la carte
+		container.innerHTML += `
+                    <article class="veille-card">
+                        <div class="card-content">
+                            <span class="badge ${badgeClass}">${badgeLabel}</span>
+                            <h3>${art.title}</h3>
+                            <p class="summary">${art.summary}</p>
+                            <div class="meta-info">
+                                <span class="date">${formattedDate}</span>
+                                <span class="source">— ${art.source}</span>
+                            </div>
+                            <a href="${art.link}" target="_blank" class="read-more">Consulter l'alerte →</a>
+                        </div>
+                    </article>`;
+            });
+        } catch (error) {
+            console.error("Erreur TechWatch:", error);
+            container.innerHTML = "<p>Le flux de veille est temporairement indisponible.</p>";
+        }
+    }
+
+    // Lancement automatique au chargement de la page
+    window.addEventListener('DOMContentLoaded', loadVeille);
+</script>
