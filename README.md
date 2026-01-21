@@ -1,4 +1,4 @@
-# 🛡️echWatch_Pro
+# TechWatch_Pro
 Agrégateur dynamique de veille en Cybersécurité.
 
 ## Fonctionnement
